@@ -25,11 +25,7 @@ export class WorkflowLogicHandler {
 	): Promise<{ node: NodeDefinition; edge: EdgeDefinition }[]> {
 		if (!result) return []
 
-		let effectiveSourceNodeId = completedNodeId
-		const completedNodeDef = blueprint.nodes.find((n) => n.id === completedNodeId)
-		if (completedNodeDef?.uses === 'loop-controller' && result.action !== 'continue')
-			// act as if the loop's end node just finished
-			effectiveSourceNodeId = completedNodeDef.params?.endNodeId
+		const effectiveSourceNodeId = completedNodeId
 
 		let directOutgoingEdges = blueprint.edges.filter((edge) => edge.source === effectiveSourceNodeId)
 		if (effectiveSourceNodeId !== completedNodeId)
