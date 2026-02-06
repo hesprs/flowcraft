@@ -108,18 +108,18 @@ export class GraphTraverser {
 		blueprint.nodes.forEach((node) => {
 			if (node.uses !== 'loop-controller') return
 
-            const nextInLoopId = blueprint.edges.find((e) => e.source === node.id && e.action === 'continue')?.target
-            if (!nextInLoopId) return
+			const nextInLoopId = blueprint.edges.find((e) => e.source === node.id && e.action === 'continue')?.target
+			if (!nextInLoopId) return
 
-            const set: Set<string> = new Set()
-            set.add(nextInLoopId)
+			const set: Set<string> = new Set()
+			set.add(nextInLoopId)
 			this.nodesInLoops.set(node.id, this.getAllLoopSuccessors(nextInLoopId, blueprint, set))
 		})
 	}
 
 	private getAllLoopSuccessors(nodeId: string, blueprint: WorkflowBlueprint, set: Set<string>): Set<string> {
 		this.getSuccessors(nodeId).forEach((successor) => {
-            if (set.has(successor)) return
+			if (set.has(successor)) return
 			const node = this.getNode(successor, blueprint)
 			if (!node || node.uses === 'loop-controller') return
 			set.add(successor)

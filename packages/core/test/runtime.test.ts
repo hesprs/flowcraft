@@ -155,14 +155,14 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 				await context.set('counter', count)
 				return { output: `iteration_${count}` }
 			})
-            const branchBeforeLoop = vi.fn(async () => ({ output: 0 }))
+			const branchBeforeLoop = vi.fn(async () => ({ output: 0 }))
 
 			const flow = createFlow('multi-node-loop-test')
 				.node('start', async ({ context }) => {
 					await context.set('counter', 0)
 					return { output: 0 }
 				})
-                .node('branchBeforeLoop', branchBeforeLoop)
+				.node('branchBeforeLoop', branchBeforeLoop)
 				.node('loopBody', async () => ({ output: 0 }))
 				.node('loopBody2', loopBodyMock)
 				.node('loopBody3', async () => ({ output: 0 }))
@@ -173,7 +173,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 					condition: 'counter < 3',
 				})
 				.edge('start', 'mainLoop')
-                .edge('start', 'branchBeforeLoop')
+				.edge('start', 'branchBeforeLoop')
 				.edge('loopBody', 'loopBody2')
 				.edge('loopBody2', 'loopBody3')
 				.edge('mainLoop', 'end')
@@ -183,7 +183,7 @@ describe('Flowcraft Runtime - Integration Tests', () => {
 
 			expect(result.status).toBe('completed')
 			expect(loopBodyMock).toHaveBeenCalledTimes(3)
-            expect(branchBeforeLoop).toBeCalled()
+			expect(branchBeforeLoop).toBeCalled()
 		})
 
 		it('should execute fallback node when main node fails', async () => {
