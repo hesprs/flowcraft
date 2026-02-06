@@ -107,19 +107,25 @@ export class GraphTraverser {
 	private filterNodesInLoops(blueprint: WorkflowBlueprint): void {
 		blueprint.nodes.forEach((node) => {
 			if (node.uses !== 'loop-controller') return
-			this.nodesInLoops.set(node.id, this.getAllLoopSuccessors(node.id, blueprint))
+
+            const nextInLoopId = blueprint.edges.find((e) => e.source === node.id && e.action === 'continue')?.target
+            if (!nextInLoopId) return
+
+            const set: Set<string> = new Set()
+            set.add(nextInLoopId)
+			this.nodesInLoops.set(node.id, this.getAllLoopSuccessors(nextInLoopId, blueprint, set))
 		})
 	}
 
-	private getAllLoopSuccessors(nodeId: string, blueprint: WorkflowBlueprint): Set<string> {
-		const successors = new Set<string>()
+	private getAllLoopSuccessors(nodeId: string, blueprint: WorkflowBlueprint, set: Set<string>): Set<string> {
 		this.getSuccessors(nodeId).forEach((successor) => {
+            if (set.has(successor)) return
 			const node = this.getNode(successor, blueprint)
 			if (!node || node.uses === 'loop-controller') return
-			successors.add(successor)
-			mergeInto(successors, this.getAllLoopSuccessors(successor, blueprint))
+			set.add(successor)
+			this.getAllLoopSuccessors(successor, blueprint, set)
 		})
-		return successors
+		return set
 	}
 
 	getReadyNodes(): ReadyNode[] {
@@ -224,7 +230,7 @@ export class GraphTraverser {
 	}
 
 	getAllSuccessors(): Map<string, Set<string>> {
-		return this.allPredecessors
+		return this.allSuccessors
 	}
 
 	getPredecessors(nodeId: string): Set<string> {
@@ -270,11 +276,4 @@ export class GraphTraverser {
 	public addToFrontier(nodeId: string): void {
 		this.frontier.add(nodeId)
 	}
-}
-
-function mergeInto<T>(target: Set<T>, source: Set<T>): Set<T> {
-	source.forEach((item) => {
-		target.add(item)
-	})
-	return target
 }

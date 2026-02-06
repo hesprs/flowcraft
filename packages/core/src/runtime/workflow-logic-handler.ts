@@ -28,9 +28,6 @@ export class WorkflowLogicHandler {
 		const effectiveSourceNodeId = completedNodeId
 
 		let directOutgoingEdges = blueprint.edges.filter((edge) => edge.source === effectiveSourceNodeId)
-		if (effectiveSourceNodeId !== completedNodeId)
-			// breaking from a loop, ignore the edge that leads back to the controller
-			directOutgoingEdges = directOutgoingEdges.filter((edge) => edge.target !== completedNodeId)
 
 		const nodesThisIsAFallbackFor = blueprint.nodes.filter((n) => n.config?.fallback === completedNodeId)
 		const inheritedOutgoingEdges = nodesThisIsAFallbackFor.flatMap((originalNode) =>
